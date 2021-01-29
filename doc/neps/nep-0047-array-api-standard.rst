@@ -225,6 +225,30 @@ no external dependency is needed. Implementation should be straightforward.
 Syntax for device support 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+NumPy itself is CPU-only, so clearly doesn't have a need for device support.
+However, other libraries (e.g. TensorFlow, PyTorch, JAX, MXNet) support
+multiple types of devices: CPU, GPU, TPU, and more exotic hardware.
+To write portable code on systems with multiple devices, it's often necessary
+to create new arrays on the same device as some other array, or check that
+two arrays live on the same device. Hence syntax for that is needed.
+
+The array object will have a ``.device`` attribute which enables comparing
+devices of different arrays (they only should compare equal if both arrays are
+from the same library and it's the same hardware device). Furthermore,
+``device=`` keywords in array creation functions are needed. For example::
+
+    def empty(shape: Union[int, Tuple[int, ...]], /, *,
+              dtype: Optional[dtype] = None,
+              device: Optional[device] = None) -> array:
+        """
+        Array API compatible wrapper for :py:func:`np.empty <numpy.empty>`.
+        """
+        return np.empty(shape, dtype=dtype, device=device)
+
+The implementation for NumPy may be as simple as setting the device attribute to
+``'cpu'`` and raising an exception if array creation functions encounter any
+other value.
+
 
 Dtypes and casting rules
 ~~~~~~~~~~~~~~~~~~~~~~~~
