@@ -150,12 +150,40 @@ Improvements to existing NumPy functionality that are needed include:
 Functions in the ``array_api`` namespace
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-work these out:
+Let's start with an example of a function implemention that shows the most
+important differences with the equivalent function in the main namespace::
 
-- do not accept ``array_like`` inputs, only ``ndarray``,
-- do not support ``__array_ufunc__`` and ``__array_function__``,
-- use positional-only and keyword-only parameters in their signatures,
-- have inline type annotations,
+    def reshape(x: array, shape: Tuple[int, ...], /) -> array:
+        """
+        Array API compatible wrapper for :py:func:`np.reshape <numpy.reshape>`.
+        """
+        return np.reshape._implementation(x, shape)
+
+This function does not accept ``array_like`` inputs, only ``ndarray``. There
+are multiple reason for this. Other array libraries all work like this.
+Letting the user do coercion of lists, generators, or other foreign objects
+separately results in a cleaner design with less unexpected behaviour.
+It's higher-performance - less overhead from ``asarray`` calls. Static typing
+is easier. Subclasses will work as expected. And the slight increase in verbosity
+because users have to explicitly coerce to ``ndarray`` seems like a small
+price to pay.
+
+This function does not support ``__array_ufunc__`` and ``__array_function__``.
+These protocols serve a similar purpose as the array API standard module itself,
+but through a different mechanims. Because only ``ndarray`` instances are accepted,
+dispatching via one of these protocols isn't useful anymore.
+
+This function uses positional-only parameters in its signature. This makes code
+more portable - writing ``reshape(x=x, ...)`` is no longer valid, hence if other
+libraries call the first parameter ``input`` rather than ``x``, that is fine.
+The rationale for keyword-only parameters (not shown in the above example) is
+two-fold: clarity of end user code, and it being easier to extend the signature
+in the future with keywords in the desired order.
+
+This function has inline type annotations. Inline annotations are far easier to
+maintain than separate stub files. And because the types are simple, this will
+not result in a large amount of clutter with type aliases or unions like in the
+current stub files NumPy has.
 
 
 DLPack support for zero-copy data interchange
