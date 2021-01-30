@@ -1,3 +1,5 @@
+.. _NEP47:
+
 ========================================
 NEP 47 — Adopting the array API standard
 ========================================
@@ -94,10 +96,46 @@ that we can't remove because of backwards compatibility reasons.
 Adoption in downstream libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- The prototype implementation will be used with SciPy, scikit-learn and
-  other libraries of interest that depend on NumPy, in order to get more
-  experience with the design and find out if any important parts are missing.
-- Removing or working around ``asarray`` in downstream libraries
+The prototype implementation of the ``numpy.array_api`` namespace will be
+used with SciPy, scikit-learn and other libraries of interest that depend on
+NumPy, in order to get more experience with the design and find out if any
+important parts are missing.
+
+The pattern to support multiple array libraries is intended to be something
+like::
+
+    def get_namespace(x):
+        if hasattr(x, '__array_namespace__'):
+            xp = x.__array_namespace__()
+        else:
+            # one could special-case np.ndarray or use np.asarray here if
+            # older numpy versions need to be supported.
+            raise ValueError("Unrecognized array input")
+
+        return xp
+
+
+    def somefunc(x):
+        xp = get_namespace(x)
+        result = xp.mean(x, axis=0) + 2*xp.std(x, axis=0)
+        return result
+
+
+
+The ``asarray`` / ``asanyarray`` pattern
+````````````````````````````````````````
+
+Many existing libraries use the same ``asarray`` (or ``asanyarray``) pattern
+as NumPy itself does; accepting any object that can be coerced into a ``np.ndarray``.
+We consider this design pattern problematic, and would advise authors of new
+libraries to avoid it. Instead they should either accept just ``np.ndarray`` or,
+if they want to support multiple kinds of arrays, check if the incoming array
+object supports the array API standard (e.g., by checking for
+``__array_namespace__`` as shown in the example above).
+
+Existing libraries can do such a check as well, and only call ``asarray`` if
+the check fails. This is very similar to the ``__duckarray__`` idea in
+:ref:`NEP30`.
 
 
 Backward compatibility
@@ -108,10 +146,10 @@ No deprecations or removals of existing NumPy APIs are proposed.
 The only potential backwards-incompatible changes we may have to consider
 are related to ``ndarray`` behaviour that cannot easily be duplicated or
 worked around in the separate namespace. For example, the standard specifies
-casting rules that conflict with the value-based casting NumPy currently does,
-and the best way of adhering to the standard with no or minor backwards
-compatibility impact is still TBD. The standard also does not support as many
-indexing methods as NumPy does - how to deal with that needs to be discussed.
+casting rules that conflict with the value-based casting NumPy currently does.
+It's very likely that this can be dealt with without any backwards
+compatibility impact, however the best way of adhering to the standard with
+no or minor backwards compatibility impact is still TBD.
 
 
 High-level design
@@ -320,8 +358,8 @@ for more details.
     This needs discussion.
 
 
-Fancy indexing, ``ndarray`` methods, and other "extras"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Advanced indexing, ``ndarray`` methods, and other "extras"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section discussed objects and behaviours that will show up in the ``array_api``
 namespace because, for practical implementation-related reasons, they are too hard
@@ -344,6 +382,12 @@ but that would likely be complicated and does not seem worth spending effort on.
 Instead, we will document that these indexing methods should be avoided for code
 to remain portable.
 
+There will be other NumPy features not mentioned in the standard that will leak
+into the ``array_api`` namespace. Examples include other ``__array_*`` methods,
+buffer protocol support, and ``ndarray`` attributes like ``flags``.
+That mixing operations that may produce views with mutation is
+`explicitly documented in the standard to not be supported <https://data-apis.github.io/array-api/latest/design_topics/copies_views_and_mutation.html>`__.
+
 It is likely that a separate reference implementation and/or a static code
 checking tool will be produced to detect usage of features unsupported by the
 array API standard. Users and library authors who care about portability of their
@@ -355,11 +399,10 @@ Implementation
 
 A mostly complete prototype of the ``array_api`` namespace can be found in
 https://github.com/data-apis/numpy/tree/array-api/numpy/_array_api.
-The docstring in ``__init__.py`` has notes on completeness of the implementation.
-The code for the wrapper functions also contains ``# TODO:`` comments
-everywhere there is a difference with the NumPy API.
+The docstring in its ``__init__.py`` has notes on completeness of the
+implementation. The code for the wrapper functions also contains ``# Note:``
+comments everywhere there is a difference with the NumPy API.
 Two parts not implemented are changes to ``ndarray``, and DLPack support.
-
 
 
 Feedback from downstream library authors
@@ -371,7 +414,16 @@ TODO - this can only be done after trying out some use cases
 Related Work
 ------------
 
-TODO 
+:ref:`NEP37` contains a similar mechanism to retrieve a NumPy-like namespace.
+In fact, NEP 37 inspired the (slightly simpler) mechanism in the array API
+standard.
+
+Other libraries have adopted large parts of NumPy's API, made changes where
+necessary, and documented deviations. See for example
+`the jax.numpy documentation <https://jax.readthedocs.io/en/latest/jax.numpy.html>`__
+and `Difference between CuPy and NumPy <https://docs.cupy.dev/en/stable/reference/difference.html>`__.
+The array API standard was constructed with the help of such comparisons, only
+between many array libraries rather than only between NumPy and one other library.
 
 
 Alternatives
