@@ -93,13 +93,19 @@ practice". That contrasts with NumPy's main namespace, which contains many
 functions and objects that have been superceded or we consider mistakes - but
 that we can't remove because of backwards compatibility reasons.
 
+The usage of the ``numpy.array_api`` namespace by downstream libraries is
+intended to enable them to consume multiple kinds of arrays, *without having
+to have a hard dependency on all of those array libraries*:
+
+.. image:: _static/nep-0047-library-dependencies.png
+
 Adoption in downstream libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The prototype implementation of the ``numpy.array_api`` namespace will be
-used with SciPy, scikit-learn and other libraries of interest that depend on
-NumPy, in order to get more experience with the design and find out if any
-important parts are missing.
+The prototype implementation of the ``array_api`` namespace will be used with
+SciPy, scikit-learn and other libraries of interest that depend on NumPy, in
+order to get more experience with the design and find out if any important
+parts are missing.
 
 The pattern to support multiple array libraries is intended to be something
 like::
@@ -158,7 +164,7 @@ High-level design
 The array API standard consists of approximately 120 objects, all of which
 have a direct NumPy equivalent. This figure shows what is included at a high level:
 
-*TODO: insert scope figure from https://data-apis.github.io/array-api/latest/purpose_and_scope.html*
+.. image:: _static/nep-0047-scope-of-array-API.png
 
 The most important changes compared to what NumPy currently offers are:
 
