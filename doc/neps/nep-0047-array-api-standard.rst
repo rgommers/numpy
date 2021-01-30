@@ -253,9 +253,55 @@ other value.
 Dtypes and casting rules
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Supported dtypes
-- Rationale for no complex support
-- Casting rules and options for supporting them
+The supported dtypes in this namespace are boolean, 8/16/32/64-bit signed and
+unsigned integer, and 32/64-bit floating-point dtypes. These will be added to
+the namespace as dtype literals with the expected names (e.g., ``bool``,
+``uint16``, ``float64``).
+
+The most obvious omissions are the complex dtypes. The rationale for the lack
+of complex support in the first version of the array API standard is that several
+libraries (PyTorch, MXNet) are still in the process of adding support for
+complex dtypes. The next version of the standard is expected to include ``complex32``
+and ``complex64`` (see `this issue <https://github.com/data-apis/array-api/issues/102>`__
+for more details).
+
+Specifying dtypes to functions, e.g. via the ``dtype=`` keyword, is expected
+to only use the dtype literals. Format strings, Python builtin dtypes, or
+string representations of the dtype literals are not accepted - this will
+improve readability and portability of code at little cost.
+
+Casting rules are only defined between different dtypes of the same kind. The
+rationale for this is that mixed-kind (e.g., integer to floating-point)
+casting behavior differs between libraries. NumPy's mixed-kind casting
+behavior doesn't need to be changed or restricted, it only needs to be
+documented that if users use mixed-kind casting, their code may not be
+portable.
+
+.. image:: _static/nep-0047-casting-rules-lattice.png
+
+*Type promotion diagram. Promotion between any two types is given by their
+join on this lattice. Only the types of participating arrays matter, not
+their values. Dashed lines indicate that behaviour for Python scalars is
+undefined on overflow. Boolean, integer and floating-point dtypes are not
+connected, indicating mixed-kind promotion is undefined.*
+
+The most important difference between the casting rules in NumPy and in the
+array API standard is how scalars and 0-dimensional arrays are handled. In
+the standard, array scalars do not exist and 0-dimensional arrays follow the
+same casting rules as higher-dimensional arrays.
+
+See the `Type Promotion Rules section of the array API standard <https://data-apis.github.io/array-api/latest/API_specification/type_promotion.html>`__
+for more details.
+
+.. note::
+
+    It is not clear what the best way is to support different casting rules
+    for 0-dimensional arrays. One option may be to implement this second set
+    of casting rules, keep them private, mark the array API functions with a
+    private attribute that says they adhere to these different rules, and let
+    the casting machinery check whether for that attribute.
+
+    This needs discussion.
 
 
 Fancy indexing, ``ndarray`` methods, and other "extras"
