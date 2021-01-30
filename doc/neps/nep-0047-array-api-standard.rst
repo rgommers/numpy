@@ -323,8 +323,31 @@ for more details.
 Fancy indexing, ``ndarray`` methods, and other "extras"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Things that will leak into the ``array_api`` namespace because they're too
-  hard to keep out
+This section discussed objects and behaviours that will show up in the ``array_api``
+namespace because, for practical implementation-related reasons, they are too hard
+to keep out.
+
+The array object in the standard does not have methods other than dunder
+methods. The rationale for that is that not all array libraries have methods
+on their array object (e.g., TensorFlow does not). It also provides only a
+single way of doing something, rather than have functions and methods that
+are effectively duplicate. Creating a wrapper object or ``ndarray`` subclass to
+remove methods from the array object in ``array_api`` does not seem appealing;
+there's too much friction for working with objects other than ``ndarray``. Instead,
+we will simply document that functions should be used instead of methods.
+
+Indexing behaviour specified in the standard does not support the full range
+of NumPy indexing behaviour. Advanced indexing with integers is not
+supported. Only boolean indexing with a single (possibly multi-dimensional)
+boolean array is supported. These indexing methods could possibly be disabled,
+but that would likely be complicated and does not seem worth spending effort on.
+Instead, we will document that these indexing methods should be avoided for code
+to remain portable.
+
+It is likely that a separate reference implementation and/or a static code
+checking tool will be produced to detect usage of features unsupported by the
+array API standard. Users and library authors who care about portability of their
+code between array libraries should be served well enough by such a tool.
 
 
 Implementation
