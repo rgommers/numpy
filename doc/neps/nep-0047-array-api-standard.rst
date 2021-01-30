@@ -355,11 +355,12 @@ for more details.
 
 .. note::
 
-    It is not clear what the best way is to support different casting rules
-    for 0-dimensional arrays. One option may be to implement this second set
-    of casting rules, keep them private, mark the array API functions with a
-    private attribute that says they adhere to these different rules, and let
-    the casting machinery check whether for that attribute.
+    It is not clear what the best way is to support the different casting rules
+    for 0-dimensional arrays and no value-based casting. One option may be to
+    implement this second set of casting rules, keep them private, mark the
+    array API functions with a private attribute that says they adhere to
+    these different rules, and let the casting machinery check whether for
+    that attribute.
 
     This needs discussion.
 
