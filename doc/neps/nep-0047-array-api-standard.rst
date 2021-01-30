@@ -122,7 +122,7 @@ have a direct NumPy equivalent. This figure shows what is included at a high lev
 
 *TODO: insert scope figure from https://data-apis.github.io/array-api/latest/purpose_and_scope.html*
 
-The most important changes are:
+The most important changes compared to what NumPy currently offers are:
 
 - Functions in the ``array_api`` namespace:
 
@@ -139,6 +139,22 @@ The most important changes are:
 - New syntax for "device support" will be added, through a ``.device``
   attribute added to ``ndarray`` and ``device=`` keywords in array creation
   functions in the ``array_api`` namespace.
+- Casting rules that differ from those NumPy currently has. Output dtypes can
+  be derived from input dtypes (i.e. no value-based casting), and 0-D arrays
+  are treated like >=1-D arrays.
+
+Furthermore there are features "missing" from the array API standard that the
+``numpy.array_api`` module will have because they cannot be easily be hidden
+or removed:
+
+- The array object in the standard does not have methods other than dunder
+  methods.
+- Indexing does not support the full range of NumPy indexing behaviour.
+  Advanced indexing with integers is not supported. Only boolean indexing
+  with a single (possibly multi-dimensional) boolean array is supported.
+- Not all dtypes NumPy has are part of the standard. For example, complex,
+  extended precision, string, void, object and datetime dtypes are not
+  included.
 
 Improvements to existing NumPy functionality that are needed include:
 
