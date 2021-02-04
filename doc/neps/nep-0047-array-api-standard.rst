@@ -41,7 +41,7 @@ frameworks pushing forward the state of the art in these fields are appearing
 every year. One unintended consequence of all this activity and creativity
 has been fragmentation in multidimensional array (a.k.a. tensor) libraries -
 which are the fundamental data structure for these fields. Choices include
-NumPy, Tensorflow, PyTorch, Dask, JAX, CuPy, MXNet, Xarray, and others.
+NumPy, Tensorflow, PyTorch, Dask, JAX, CuPy, MXNet, and others.
 
 The APIs of each of these libraries are largely similar, but with enough
 differences that it’s quite difficult to write code that works with multiple
@@ -210,7 +210,7 @@ Improvements to existing NumPy functionality that are needed include:
 Functions in the ``array_api`` namespace
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's start with an example of a function implemention that shows the most
+Let's start with an example of a function implementation that shows the most
 important differences with the equivalent function in the main namespace::
 
     def reshape(x: array, shape: Tuple[int, ...], /) -> array:
@@ -220,7 +220,7 @@ important differences with the equivalent function in the main namespace::
         return np.reshape._implementation(x, shape)
 
 This function does not accept ``array_like`` inputs, only ``ndarray``. There
-are multiple reason for this. Other array libraries all work like this.
+are multiple reasons for this. Other array libraries all work like this.
 Letting the user do coercion of lists, generators, or other foreign objects
 separately results in a cleaner design with less unexpected behaviour.
 It's higher-performance - less overhead from ``asarray`` calls. Static typing
@@ -230,7 +230,7 @@ price to pay.
 
 This function does not support ``__array_ufunc__`` and ``__array_function__``.
 These protocols serve a similar purpose as the array API standard module itself,
-but through a different mechanims. Because only ``ndarray`` instances are accepted,
+but through a different mechanisms. Because only ``ndarray`` instances are accepted,
 dispatching via one of these protocols isn't useful anymore.
 
 This function uses positional-only parameters in its signature. This makes code
@@ -278,14 +278,14 @@ Adding support for DLPack to NumPy entails:
 - Adding a ``from_dlpack`` function, which takes as input an object
   supporting ``__dlpack__``, and returns an ``ndarray``.
 
-DLPack is current a ~200 LoC header, and is meant to be included directly, so
+DLPack is currently a ~200 LoC header, and is meant to be included directly, so
 no external dependency is needed. Implementation should be straightforward.
 
 
 Syntax for device support 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-NumPy itself is CPU-only, so clearly doesn't have a need for device support.
+NumPy itself is CPU-only, so it clearly doesn't have a need for device support.
 However, other libraries (e.g. TensorFlow, PyTorch, JAX, MXNet) support
 multiple types of devices: CPU, GPU, TPU, and more exotic hardware.
 To write portable code on systems with multiple devices, it's often necessary
@@ -306,8 +306,8 @@ from the same library and it's the same hardware device). Furthermore,
         return np.empty(shape, dtype=dtype, device=device)
 
 The implementation for NumPy may be as simple as setting the device attribute to
-``'cpu'`` and raising an exception if array creation functions encounter any
-other value.
+the string ``'cpu'`` and raising an exception if array creation functions
+encounter any other value.
 
 
 Dtypes and casting rules
