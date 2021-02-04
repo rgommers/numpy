@@ -127,11 +127,15 @@ The ``asarray`` / ``asanyarray`` pattern
 
 Many existing libraries use the same ``asarray`` (or ``asanyarray``) pattern
 as NumPy itself does; accepting any object that can be coerced into a ``np.ndarray``.
-We consider this design pattern problematic, and would advise authors of new
-libraries to avoid it. Instead they should either accept just ``np.ndarray`` or,
-if they want to support multiple kinds of arrays, check if the incoming array
-object supports the array API standard (e.g., by checking for
-``__array_namespace__`` as shown in the example above).
+We consider this design pattern problematic - keeping in mind the Zen of
+Python, *"explicit is better than implicit"*, as well as the pattern being
+historically problematic in the SciPy ecosystem for ``ndarray`` subclasses
+and with over-eager object creation. All other array/tensor libraries are
+more strict, and that works out fine in practice. We would advise authors of
+new libraries to avoid the ``asarray`` pattern. Instead they should either
+accept just NumPy arrays or, if they want to support multiple kinds of
+arrays, check if the incoming array object supports the array API standard
+by checking for ``__array_namespace__`` as shown in the example above.
 
 Existing libraries can do such a check as well, and only call ``asarray`` if
 the check fails. This is very similar to the ``__duckarray__`` idea in
