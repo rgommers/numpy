@@ -282,9 +282,9 @@ DLPack works in a very similar way. The main reasons to prefer DLPack over
 the options already present in NumPy are:
 
 1. DLPack is the only protocol with device support (e.g., GPUs using CUDA or
-   ROCm drivers, TPUs). NumPy is CPU-only, but other array libraries are not.
-   Having one protocol per device isn't tenable, hence device support is a
-   must.
+   ROCm drivers, or OpenCL devices). NumPy is CPU-only, but other array
+   libraries are not. Having one protocol per device isn't tenable, hence
+   device support is a must.
 2. Widespread support. DLPack has the widest adoption of all protocols, only
    NumPy is missing support. And the experiences of other libraries with it
    are positive. This contrasts with the protocols NumPy does support, which
@@ -383,6 +383,13 @@ for more details.
     that attribute.
 
     This needs discussion.
+
+
+Indexing
+~~~~~~~~
+
+- 0-D arrays returned, no array scalars
+- no advanced indexing, only limited boolean indexing
 
 
 Advanced indexing, ``ndarray`` methods, and other "extras"
