@@ -127,7 +127,6 @@ like::
         return result
 
 
-
 The ``asarray`` / ``asanyarray`` pattern
 ````````````````````````````````````````
 
@@ -142,6 +141,23 @@ object supports the array API standard (e.g., by checking for
 Existing libraries can do such a check as well, and only call ``asarray`` if
 the check fails. This is very similar to the ``__duckarray__`` idea in
 :ref:`NEP30`.
+
+
+Adoption in application code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new namespace can be seen by end users as a cleaned up and slimmed down
+version of NumPy's main namespace. Encouraging end users to use this
+namespace like::
+
+    import numpy.array_api as xp
+
+    x = xp.linspace(0, 2*xp.pi, num=100)
+    y = xp.cos(x)
+
+seems perfectly reasonable, and potentially beneficial - users get offered only
+one function for each purpose (the one we consider best-practice), and they
+then write code that is more easily portable to other libraries.
 
 
 Backward compatibility
