@@ -110,21 +110,16 @@ parts are missing.
 The pattern to support multiple array libraries is intended to be something
 like::
 
-    def get_namespace(x):
-        if hasattr(x, '__array_namespace__'):
-            xp = x.__array_namespace__()
-        else:
-            # one could special-case np.ndarray or use np.asarray here if
-            # older numpy versions need to be supported.
-            raise ValueError("Unrecognized array input")
+    def somefunc(x, y):
+        # Retrieves standard namespace. Raises if x and y have different
+        # namespaces.  See Appendix for possible get_namespace implementation
+        xp = get_namespace(x, y)
+        out = xp.mean(x, axis=0) + 2*xp.std(y, axis=0)
+        return out
 
-        return xp
-
-
-    def somefunc(x):
-        xp = get_namespace(x)
-        result = xp.mean(x, axis=0) + 2*xp.std(x, axis=0)
-        return result
+The ``get_namespace`` call is effectively the library author opting in to
+using the standard API namespace, and thereby explicitly supporting
+all conforming array libraries.
 
 
 The ``asarray`` / ``asanyarray`` pattern
@@ -142,6 +137,8 @@ Existing libraries can do such a check as well, and only call ``asarray`` if
 the check fails. This is very similar to the ``__duckarray__`` idea in
 :ref:`NEP30`.
 
+
+.. _adoption-application-code:
 
 Adoption in application code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -452,6 +449,35 @@ between many array libraries rather than only between NumPy and one other librar
 Alternatives
 ------------
 
+
+
+
+Appendix - a possible ``get_namespace`` implementation
+------------------------------------------------------
+
+The ``get_namespace`` function mentioned in the
+:ref:`adoption-application-code` section can be implemented like::
+
+    def get_namespace(*xs):
+        # `xs` contains one or more arrays, or possibly Python scalars (accepting
+        # those is a matter of taste, but doesn't seem unreasonable).
+        namespaces = {
+            x.__array_namespace__() if hasattr(x, '__array_namespace__') else None for x in xs if not isinstance(x, (bool, int, float, complex))
+        }
+
+        if not namespaces:
+            # one could special-case np.ndarray above or use np.asarray here if
+            # older numpy versions need to be supported.
+            raise ValueError("Unrecognized array input")
+
+        if len(namespaces) != 1:
+            raise ValueError(f"Multiple namespaces for array inputs: {namespaces}")
+
+        xp, = namespaces
+        if xp is None:
+            raise ValueError("The input is not  a supported array type")
+
+        return xp
 
 
 Discussion
