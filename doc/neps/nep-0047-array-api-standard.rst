@@ -10,7 +10,7 @@ NEP 47 — Adopting the array API standard
 :Status: Draft
 :Type: Standards Track
 :Created: 2021-01-21
-:Resolution: 
+:Resolution:
 
 
 Abstract
@@ -18,7 +18,7 @@ Abstract
 
 We propose to adopt the `Python array API standard`_, developed by the
 `Consortium for Python Data API Standards`_. Implementing this as a separate
-new namespace in NumPy will allow authors of libraries which depend on NumPy 
+new namespace in NumPy will allow authors of libraries which depend on NumPy
 as well as end users to write code that is portable between NumPy and all
 other array/tensor libraries that adopt this standard.
 
@@ -30,7 +30,7 @@ other array/tensor libraries that adopt this standard.
     design and implementation, and learn what needs describing better in this
     NEP or changing in either the implementation or the array API standard
     itself.
-    
+
 
 Motivation and Scope
 --------------------
@@ -62,10 +62,11 @@ The scope of this NEP includes:
 
 - Adopting the 2021 version of the array API standard
 - Adding a separate namespace, tentatively named ``numpy.array_api``
-- Changes needed outside of the new namespace, for example a new dunder
-  method and a new attribute on the ``ndarray`` object
+- Changes needed/desired outside of the new namespace, for example new dunder
+  methods on the ``ndarray`` object
 - Implementation choices, and differences between functions in the new
   namespace with those in the main ``numpy`` namespace
+- A new array object conforming to the array API standard
 - Maintenance effort and testing strategy
 - Impact on NumPy's total exposed API surface and on other future and
   under-discussion design choices
@@ -164,15 +165,8 @@ then write code that is more easily portable to other libraries.
 Backward compatibility
 ----------------------
 
-No deprecations or removals of existing NumPy APIs are proposed.
-
-The only potential backwards-incompatible changes we may have to consider
-are related to ``ndarray`` behaviour that cannot easily be duplicated or
-worked around in the separate namespace. For example, the standard specifies
-casting rules that conflict with the value-based casting NumPy currently does.
-It's very likely that this can be dealt with without any backwards
-compatibility impact, however the best way of adhering to the standard with
-no or minor backwards compatibility impact is still TBD.
+No deprecations or removals of existing NumPy APIs or other backwards
+incompatible changes are proposed.
 
 
 High-level design
@@ -184,6 +178,17 @@ have a direct NumPy equivalent. This figure shows what is included at a high lev
 .. image:: _static/nep-0047-scope-of-array-API.png
 
 The most important changes compared to what NumPy currently offers are:
+
+- A new array object which:
+
+    - conforms to the casting rules and indexing behaviour specified by the
+      standard,
+    - does not have methods other than dunder methods,
+    - does not support the full range of NumPy indexing behaviour. Advanced
+      indexing with integers is not supported. Only boolean indexing
+      with a single (possibly multi-dimensional) boolean array is supported.
+      An indexing expression that selects a single element returns a 0-D array
+      rather than a scalar.
 
 - Functions in the ``array_api`` namespace:
 
@@ -198,24 +203,16 @@ The most important changes compared to what NumPy currently offers are:
 
 - DLPack_ support will be added to NumPy,
 - New syntax for "device support" will be added, through a ``.device``
-  attribute added to ``ndarray`` and ``device=`` keywords in array creation
-  functions in the ``array_api`` namespace.
+  attribute on the new array object, and ``device=`` keywords in array creation
+  functions in the ``array_api`` namespace,
 - Casting rules that differ from those NumPy currently has. Output dtypes can
   be derived from input dtypes (i.e. no value-based casting), and 0-D arrays
   are treated like >=1-D arrays.
-
-Furthermore there are features "missing" from the array API standard that the
-``numpy.array_api`` module will have because they cannot be easily be hidden
-or removed:
-
-- The array object in the standard does not have methods other than dunder
-  methods.
-- Indexing does not support the full range of NumPy indexing behaviour.
-  Advanced indexing with integers is not supported. Only boolean indexing
-  with a single (possibly multi-dimensional) boolean array is supported.
-- Not all dtypes NumPy has are part of the standard. For example, complex,
-  extended precision, string, void, object and datetime dtypes are not
-  included.
+- Not all dtypes NumPy has are part of the standard. Only boolean, signed and
+  unsigned integers, and floating-point dtypes up to ``float64`` are supported.
+  Complex dtypes are expected to be added in the next version of the standard.
+  Extended precision, string, void, object and datetime dtypes, as well as
+  structured dtypes, are not included.
 
 Improvements to existing NumPy functionality that are needed include:
 
@@ -276,7 +273,7 @@ supports two of these, namely the buffer protocol (i.e., PEP 3118), and
 the ``__array_interface__`` (Python side) / ``__array_struct__`` (C side)
 protocol. Both work similarly, letting the "producer" describe how the data
 is laid out in memory so the "consumer" can construct its own kind of array
-with a view on that data. 
+with a view on that data.
 
 DLPack works in a very similar way. The main reasons to prefer DLPack over
 the options already present in NumPy are:
@@ -302,7 +299,7 @@ DLPack is currently a ~200 LoC header, and is meant to be included directly, so
 no external dependency is needed. Implementation should be straightforward.
 
 
-Syntax for device support 
+Syntax for device support
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 NumPy itself is CPU-only, so it clearly doesn't have a need for device support.
@@ -388,55 +385,72 @@ for more details.
 Indexing
 ~~~~~~~~
 
-- 0-D arrays returned, no array scalars
-- no advanced indexing, only limited boolean indexing
+An indexing expression that would return a scalar with ``ndarray``, e.g.
+``arr_2d[0, 0]``, will return a 0-D array with the new array object. There are
+several reasons for that: array scalars are largely considered a design mistake
+which no other array library copied; it works better for non-CPU libraries
+(typically arrays can live on the device, scalars live on the host); and it's
+simply a consistent design. To get a Python scalar out of a 0-D array, one can
+simply use the builtin for the type, e.g. ``float(arr_0d)``.
+
+The other `indexing modes in the standard <https://data-apis.github.io/array-api/latest/API_specification/indexing.html>`__
+do work the same as they do for ``numpy.ndarray``.
+
+The lack of advanced indexing, and boolean indexing being limited to a single
+n-D boolean array, is due to those indexing modes not being suitable for all
+types of arrays or JIT compilation. Their absence does not seem to be
+problematic; if a user or library author wants to use them, they can do so
+through zero-copy conversion to ``numpy.ndarray``. This will signal correctly
+to whomever reads the code that it is then NumPy-specific rather than portable
+to all conforming array types.
 
 
-Advanced indexing, ``ndarray`` methods, and other "extras"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This section discussed objects and behaviours that will show up in the ``array_api``
-namespace because, for practical implementation-related reasons, they are too hard
-to keep out.
+The array object
+~~~~~~~~~~~~~~~~
 
 The array object in the standard does not have methods other than dunder
 methods. The rationale for that is that not all array libraries have methods
 on their array object (e.g., TensorFlow does not). It also provides only a
 single way of doing something, rather than have functions and methods that
-are effectively duplicate. Creating a wrapper object or ``ndarray`` subclass to
-remove methods from the array object in ``array_api`` does not seem appealing;
-there's too much friction for working with objects other than ``ndarray``. Instead,
-we will simply document that functions should be used instead of methods.
+are effectively duplicate.
 
-Indexing behaviour specified in the standard does not support the full range
-of NumPy indexing behaviour. Advanced indexing with integers is not
-supported. Only boolean indexing with a single (possibly multi-dimensional)
-boolean array is supported. These indexing methods could possibly be disabled,
-but that would likely be complicated and does not seem worth spending effort on.
-Instead, we will document that these indexing methods should be avoided for code
-to remain portable.
-
-There will be other NumPy features not mentioned in the standard that will leak
-into the ``array_api`` namespace. Examples include other ``__array_*`` methods,
-buffer protocol support, and ``ndarray`` attributes like ``flags``.
-That mixing operations that may produce views with mutation is
+Mixing operations that may produce views (e.g., indexing, ``nonzero``,
+``where``) in combination with mutation (e.g., item or slice assignment) is
 `explicitly documented in the standard to not be supported <https://data-apis.github.io/array-api/latest/design_topics/copies_views_and_mutation.html>`__.
+This cannot easily be prohibited in the array object itself; instead this will
+be guidance to the user via documentation.
 
-It is likely that a separate reference implementation and/or a static code
-checking tool will be produced to detect usage of features unsupported by the
-array API standard. Users and library authors who care about portability of their
-code between array libraries should be served well enough by such a tool.
+The standard current does not prescribe a name for the array object itself.
+We propose to simply name it ``ndarray``. This is the most obvious name, and
+because of the separate namespace should not clash with ``numpy.ndarray``.
 
 
 Implementation
 --------------
 
-A mostly complete prototype of the ``array_api`` namespace can be found in
+A prototype of the ``array_api`` namespace can be found in
 https://github.com/data-apis/numpy/tree/array-api/numpy/_array_api.
 The docstring in its ``__init__.py`` has notes on completeness of the
 implementation. The code for the wrapper functions also contains ``# Note:``
 comments everywhere there is a difference with the NumPy API.
-Two parts not implemented are changes to ``ndarray``, and DLPack support.
+Two important parts that are not implemented yet are the new array object and
+DLPack support. Functions may need changes to ensure the changed casting rules
+are respected.
+
+Regarding the array object implementation, we plan to start with a regular
+Python class that wraps a ``numpy.ndarray`` instance. Attributes and methods
+can forward to that wrapped instance, applying input validation and
+implementing changed behaviour as needed.
+
+The casting rules are probably the most challenging part. The in-progress
+dtype system refactor (NEPs 40-43) should make implementing the correct casting
+behaviour easier - it is already moving away from value-based casting for
+example.
+
+.. note::
+
+    This section needs a lot more detail, which will gradually be added when
+    the implementation progresses.
 
 
 Feedback from downstream library authors
