@@ -395,7 +395,10 @@ simply a consistent design. To get a Python scalar out of a 0-D array, one can
 simply use the builtin for the type, e.g. ``float(arr_0d)``.
 
 The other `indexing modes in the standard <https://data-apis.github.io/array-api/latest/API_specification/indexing.html>`__
-do work the same as they do for ``numpy.ndarray``.
+do work largely the same as they do for ``numpy.ndarray``. One noteworthy
+difference is that clipping in slice indexing (e.g., ``a[:n]`` where ``n`` is
+larger than the size of the first axis) is unspecified behaviour, because
+that kind of check can be expensive on accelerators.
 
 The lack of advanced indexing, and boolean indexing being limited to a single
 n-D boolean array, is due to those indexing modes not being suitable for all
@@ -404,6 +407,7 @@ problematic; if a user or library author wants to use them, they can do so
 through zero-copy conversion to ``numpy.ndarray``. This will signal correctly
 to whomever reads the code that it is then NumPy-specific rather than portable
 to all conforming array types.
+
 
 
 The array object
@@ -415,8 +419,8 @@ on their array object (e.g., TensorFlow does not). It also provides only a
 single way of doing something, rather than have functions and methods that
 are effectively duplicate.
 
-Mixing operations that may produce views (e.g., indexing, ``nonzero``,
-``where``) in combination with mutation (e.g., item or slice assignment) is
+Mixing operations that may produce views (e.g., indexing, ``nonzero``)
+in combination with mutation (e.g., item or slice assignment) is
 `explicitly documented in the standard to not be supported <https://data-apis.github.io/array-api/latest/design_topics/copies_views_and_mutation.html>`__.
 This cannot easily be prohibited in the array object itself; instead this will
 be guidance to the user via documentation.
