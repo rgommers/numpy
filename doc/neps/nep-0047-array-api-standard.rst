@@ -504,7 +504,7 @@ The ``get_namespace`` function mentioned in the
 
         xp, = namespaces
         if xp is None:
-            raise ValueError("The input is not  a supported array type")
+            raise ValueError("The input is not a supported array type")
 
         return xp
 
