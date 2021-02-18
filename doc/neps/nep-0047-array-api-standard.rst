@@ -219,6 +219,7 @@ Improvements to existing NumPy functionality that are needed include:
 - Add support for stacks of matrices to some functions in ``numpy.linalg``
   that are currently missing such support.
 - Add the ``keepdims`` keyword to ``np.argmin`` and ``np.argmax``.
+- Add a "never copy" mode to ``np.asarray``.
 
 
 Functions in the ``array_api`` namespace
