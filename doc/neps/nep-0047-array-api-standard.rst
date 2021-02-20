@@ -433,6 +433,11 @@ because of the separate namespace should not clash with ``numpy.ndarray``.
 Implementation
 --------------
 
+.. note::
+
+    This section needs a lot more detail, which will gradually be added when
+    the implementation progresses.
+
 A prototype of the ``array_api`` namespace can be found in
 https://github.com/data-apis/numpy/tree/array-api/numpy/_array_api.
 The docstring in its ``__init__.py`` has notes on completeness of the
@@ -441,6 +446,9 @@ comments everywhere there is a difference with the NumPy API.
 Two important parts that are not implemented yet are the new array object and
 DLPack support. Functions may need changes to ensure the changed casting rules
 are respected.
+
+The array object
+~~~~~~~~~~~~~~~~
 
 Regarding the array object implementation, we plan to start with a regular
 Python class that wraps a ``numpy.ndarray`` instance. Attributes and methods
@@ -452,10 +460,51 @@ dtype system refactor (NEPs 40-43) should make implementing the correct casting
 behaviour easier - it is already moving away from value-based casting for
 example.
 
-.. note::
 
-    This section needs a lot more detail, which will gradually be added when
-    the implementation progresses.
+The dtype objects
+~~~~~~~~~~~~~~~~~
+
+We must be able to compare dtypes for equality, and expressions like these must
+be possible::
+
+    np.array_api.some_func(..., dtype=x.dtype)
+
+The above implies it would be nice to have ``np.array_api.float32 ==
+np.array_api.ndarray(...).dtype``.
+
+Dtypes should not be assumed to have a class hierarchy by users, however we are
+free to implement it with a class hierarchy if that's convenient. We considered
+the following options to implement dtype objects:
+
+1. Alias dtypes to those in the main namespace. E.g., ``np.array_api.float32 =
+   np.float32``.
+2. Make the dtypes instances of ``np.dtype``. E.g., ``np.array_api.float32 =
+   np.dtype(np.float32)``.
+3. Create new singleton classes with only the required methods/attributes
+   (currently just ``__eq__``).
+
+It seems like (2) would be easiest from the perspective of interacting with
+functions outside the main namespace. And (3) would adhere best to the
+standard.
+
+TBD: the standard does not yet have a good way to inspect properties of a
+dtype, to ask questions like "is this an integer dtype?". Perhaps this is easy
+enough to do for users, like so::
+
+    def _get_dtype(dt_or_arr):
+        return dt_or_arr.dtype if hasattr(dt_or_arr, 'dtype') else dt_or_arr
+
+    def is_floating(dtype_or_array):
+        dtype = _get_dtype(dtype_or_array)
+        return dtype in (float32, float64)
+
+    def is_integer(dtype_or_array):
+        dtype = _get_dtype(dtype_or_array)
+        return dtype in (uint8, uint16, uint32, uint64, int8, int16, int32, int64)
+
+However it could make sense to add to the standard. Note that NumPy itself
+currently does not have a great for asking such questions, see
+`gh-17325 <https://github.com/numpy/numpy/issues/17325>`__.
 
 
 Feedback from downstream library authors
