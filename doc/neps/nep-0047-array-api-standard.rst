@@ -512,6 +512,8 @@ Feedback from downstream library authors
 
 TODO - this can only be done after trying out some use cases
 
+Leo Fang (CuPy): *"My impression is for CuPy we could simply take this new array object and s/numpy/cupy"*
+
 
 Related Work
 ------------
