@@ -339,8 +339,8 @@ the namespace as dtype literals with the expected names (e.g., ``bool``,
 The most obvious omissions are the complex dtypes. The rationale for the lack
 of complex support in the first version of the array API standard is that several
 libraries (PyTorch, MXNet) are still in the process of adding support for
-complex dtypes. The next version of the standard is expected to include ``complex32``
-and ``complex64`` (see `this issue <https://github.com/data-apis/array-api/issues/102>`__
+complex dtypes. The next version of the standard is expected to include ``complex64``
+and ``complex128`` (see `this issue <https://github.com/data-apis/array-api/issues/102>`__
 for more details).
 
 Specifying dtypes to functions, e.g. via the ``dtype=`` keyword, is expected
