@@ -5490,7 +5490,23 @@ class MaskedArray(ndarray):
                 fill_value = maximum_fill_value(self)
 
         filled = self.filled(fill_value)
-        return filled.argsort(axis=axis, kind=kind, order=order)
+        indices = filled.argsort(axis=axis, kind=kind, order=order)
+        if (self.ndim == 1 and self.mask is not nomask and self.mask.ndim == 1
+                and self.mask.dtype == np.bool_):
+            # 1. Reconstruct sorted array (checking for issue with extreme
+            #    values, see gh-14804)
+            self_sorted = np.take(self, indices)
+            # 2. Check if mask is sorted [False, False, ..., True, True]
+            diffs = np.diff(self_sorted.mask.astype(int))
+            if endwith and np.any(diffs < 0):
+                # 3. Apparently not - fix it!
+                unmasked = np.where(~self_sorted.mask)[0]
+                masked = np.where(self_sorted.mask)[0]
+                indices = np.concatenate((indices[unmasked],
+                                          indices[masked]))
+                #import IPython; IPython.embed()
+
+        return indices
 
     def argmin(self, axis=None, fill_value=None, out=None):
         """
