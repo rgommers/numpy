@@ -3,7 +3,7 @@ name: Test Meson build (Linux)
 on:
   push:
     branches:
-      - meson
+      - longdouble-debug
   pull_request:
     branches:
       - meson
