@@ -266,7 +266,7 @@ elif longdouble_size == 16
   if endianness == 'little'
     # FIXME: this varies, there's multiple formats here!
     #Ralf's Linux desktop: longdouble_format = 'INTEL_EXTENDED_16_BYTES_LE'
-    longdouble_format = 'IEEE_QUAD_LE'
+    longdouble_format = 'INTEL_EXTENDED_12_BYTES_LE'
   else
     error('No idea what this is ....')
   endif
