@@ -211,6 +211,9 @@ if have_strtold_l
   cdata.set10('HAVE_STRTOLD_L', true)
 endif
 
+# DEBUG!
+cdata.set10('HAVE_STRTOLD_L', false)
+
 # Other optional functions
 if cc.has_function('backtrace', prefix: '#include <execinfo.h>')
   cdata.set10('HAVE_BACKTRACE', true)
