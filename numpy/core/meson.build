@@ -200,7 +200,7 @@ have_strtold_l = cc.has_function('strtold_l', include_directories: inc_curdir,
 ''')
 if not have_strtold_l
   # Retry with locale.h, seems to vary across Linux distros
-  result = cc.has_function('strtold_l', include_directories: inc_curdir,
+  have_strtold_l = cc.has_function('strtold_l', include_directories: inc_curdir,
     prefix:'''
     #include <stdlib.h>
     #include <locale.h>
@@ -210,9 +210,6 @@ endif
 if have_strtold_l
   cdata.set10('HAVE_STRTOLD_L', true)
 endif
-
-# DEBUG!
-cdata.set10('HAVE_STRTOLD_L', false)
 
 # Other optional functions
 if cc.has_function('backtrace', prefix: '#include <execinfo.h>')
