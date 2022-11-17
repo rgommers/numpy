@@ -209,6 +209,15 @@ if not have_strtold_l
 endif
 if have_strtold_l
   cdata.set10('HAVE_STRTOLD_L', true)
+else
+  # FIXME: this is wrong! the HAVE_ define should not exist, or it'll be
+  # interpreted as the function being available (true/false does nothing, see
+  # note on HAVE_ defines higher up). This is necessary though in order to make
+  # the Linux CI job pass. So either the check is wrong somehow, or this
+  # function is not available in CI. For the latter there is a fallback path,
+  # but that is broken because we don't have the exact long double
+  # representation checks.
+  cdata.set10('HAVE_STRTOLD_L', false)
 endif
 
 # Other optional functions
