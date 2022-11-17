@@ -253,6 +253,7 @@ has_optimize_attribute = cc.has_function_attribute('optimize')  # FIXME
 # numpy.distutils based build, see https://github.com/mesonbuild/meson/issues/11068
 longdouble_size = cc.sizeof('long double')
 endianness = host_machine.endian()
+message('Endianness: ' + endianness)
 if longdouble_size == 8
   if endianness == 'little'
     longdouble_format = 'IEEE_DOUBLE_LE'
