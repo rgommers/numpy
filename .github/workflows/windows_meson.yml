@@ -123,4 +123,4 @@ jobs:
       - name: Run test suite (fast)
         run: |
           cd tools
-          python -m pytest --pyargs numpy -m "not slow"
+          python -m pytest --pyargs numpy -m "not slow" -n2
