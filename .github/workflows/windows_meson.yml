@@ -20,7 +20,7 @@ permissions:
   contents: read # to fetch code (actions/checkout)
 
 jobs:
-  msvc_64bit-python_openblas:
+  msvc_64bit_python_openblas:
     name: MSVC, x86-64, LP64 OpenBLAS
     runs-on: windows-2019
     if: "github.repository == 'numpy/numpy'"
@@ -90,8 +90,8 @@ jobs:
         python -c "import numpy, sys; sys.exit(numpy.test(verbose=3) is False)"
         echo "LASTEXITCODE is '$LASTEXITCODE'"
 
-  msvc_64bit-python_openblas:
-    name: MSVC, i686-64, no BLAS
+  msvc_32bit_python_openblas:
+    name: MSVC, 32-bit Python, no BLAS
     runs-on: windows-2019
     if: "github.repository == 'rgommers/numpy'"
     steps:
@@ -114,8 +114,12 @@ jobs:
 
       - name: Build and install
         run: |
-          python -m pip install .
+          python -m pip install . -v
 
-      - name: Test
+      - name: Install test dependencies
+        run: |
+          python -m pip install -r test_requirements.txt
+
+      - name: Run test suite (full)
         run: |
           python -m pytest --pyargs numpy
