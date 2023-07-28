@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - ci-win-python32bit
 
 env:
   PYTHON_VERSION: 3.11
@@ -90,7 +93,7 @@ jobs:
   msvc_64bit-python_openblas:
     name: MSVC, i686-64, no BLAS
     runs-on: windows-2019
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     steps:
       - name: Checkout
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
