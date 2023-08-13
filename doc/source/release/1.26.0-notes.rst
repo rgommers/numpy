@@ -25,6 +25,57 @@ The highlights of this release are:
 
 The Python versions supported in this release are 3.9-3.12.
 
+Build system changes
+====================
+
+In this release, NumPy has switched to Meson as the build system and
+meson-python as the build backend. Installing NumPy or building a wheel can be
+done with standard tools like ``pip`` and ``pypa/build``. The following are
+supported:
+
+- Regular installs: ``pip install numpy`` or (in a cloned repo)
+  ``pip install .``
+- Building a wheel: ``python -m build`` (preferred), or ``pip wheel .``
+- Editable installs: ``pip install -e . --no-build-isolation``
+- Development builds through the custom CLI implemented with
+  `spin <https://github.com/scientific-python/spin>`__: ``spin build``.
+
+All the regular ``pip`` and ``pypa/build`` flags (e.g.,
+``--no-build-isolation``) should work as expected.
+
+NumPy-specific build customization
+----------------------------------
+
+Many of the NumPy-specific ways of customizing builds have changed.
+The ``NPY_*`` environment variables which control BLAS/LAPACK, SIMD, threading,
+and other such options are no longer supported, nor is a ``site.cfg`` file to
+select BLAS and LAPACK. Instead, there are command-line flags that can be
+passed to the build via ``pip``/``build``'s config-settings interface. These
+flags are all listed in the ``meson_options.txt`` file in the root of the repo.
+Detailed documented will be available before the final 1.26.0 release; for now
+please see `the SciPy "building from source" docs
+<http://scipy.github.io/devdocs/building/index.html>`__ since most build
+customization works in an almost identical way in SciPy as it does in NumPy.
+
+Build dependencies
+------------------
+
+While the runtime dependencies of NumPy have not changed, the build
+dependencies have. Because we temporarily vendor Meson and meson-python,
+there are several new dependencies - please see the ``[build-system]`` section
+of ``pyproject.toml`` for details.
+
+Troubleshooting
+---------------
+
+This build system change is quite large. In case of unexpected issues, it is
+still possible to use a ``setup.py``-based build as a temporary workaround (on
+Python 3.9-3.11, not 3.12), by copying ``pyproject.toml.setuppy`` to
+``pyproject.toml``. However, please open an issue with details on the NumPy
+issue tracker. We aim to phase out ``setup.py`` builds as soon as possible, and
+therefore would like to see all potential blockers surfaced early on in the
+1.26.0 release cycle.
+
 Contributors
 ============
 
