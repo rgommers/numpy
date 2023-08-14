@@ -325,7 +325,8 @@ else:
             import numpy.array_api as array_api
             return array_api
         elif attr == "distutils":
-            if sys.version_info < (3, 12):
+            import sys
+            if sys.version_info < (3, 11):
                 import numpy.distutils as distutils
                 return distutils
             else:
