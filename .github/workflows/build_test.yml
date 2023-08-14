@@ -5,7 +5,6 @@ on:
     branches:
       # coverage comparison in the "full" step needs to run on main after merges
       - main
-      - fix-getattr-distutils
   pull_request:
     branches:
       - main
@@ -78,7 +77,7 @@ jobs:
     - uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4.7.0
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: ./.github/meson_actions
+    - uses: ./.github/actions
 
   old_gcc:
     needs: [smoke_test]
@@ -119,9 +118,9 @@ jobs:
       run: pythonx runtests.py -n
 
   without_optimizations:
-    # needs: [smoke_test]
+    needs: [smoke_test]
     runs-on: ubuntu-latest
-    # if: github.event_name != 'push'
+    if: github.event_name != 'push'
     env:
       MESON_ARGS: "-Dallow-noblas=true -Ddisable-optimization=true"
     steps:
