@@ -225,8 +225,10 @@ else:
     __numpy_submodules__ = {
         "linalg", "fft", "dtypes", "random", "polynomial", "ma", 
         "exceptions", "lib", "ctypeslib", "testing", "typing",
-        "array_api", "f2py", "distutils", "test"
+        "array_api", "f2py", "test"
     }
+    if sys.version_info < (3, 12):
+        __numpy_submodules__ += 'distutils'
 
     # We build warning messages for former attributes
     _msg = (
@@ -325,8 +327,7 @@ else:
             import numpy.array_api as array_api
             return array_api
         elif attr == "distutils":
-            import sys
-            if sys.version_info < (3, 11):
+            if 'distutils' in __numpy-submodules__:
                 import numpy.distutils as distutils
                 return distutils
             else:
