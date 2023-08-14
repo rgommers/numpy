@@ -325,8 +325,12 @@ else:
             import numpy.array_api as array_api
             return array_api
         elif attr == "distutils":
-            import numpy.distutils as distutils
-            return distutils
+            if sys.version_info < (3, 12):
+                import numpy.distutils as distutils
+                return distutils
+            else:
+                raise AttributeError("`numpy.distutils` is not available from "
+                                     "Python 3.12 onwards")
 
         if attr in __future_scalars__:
             # And future warnings for those that will change, but also give
