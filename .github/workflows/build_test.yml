@@ -5,6 +5,7 @@ on:
     branches:
       # coverage comparison in the "full" step needs to run on main after merges
       - main
+      - fix-getattr-distutils
   pull_request:
     branches:
       - main
