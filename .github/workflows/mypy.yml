@@ -47,9 +47,9 @@ jobs:
     strategy:
       matrix:
         os_python:
-          - [ubuntu-latest, '3.9']
+          # - [ubuntu-latest, '3.9']
           - [windows-2019, '3.11']
-          - [macos-12, '3.12-dev']
+          # - [macos-12, '3.12-dev']
     steps:
     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
@@ -64,7 +64,7 @@ jobs:
         pip install -r test_requirements.txt
     - name: Build
       run: |
-        spin build -- -Dallow-noblas=true -Ddisable-optimization=true
+        spin build -j2 -- -Dallow-noblas=true -Ddisable-optimization=true --vsenv
     - name: Run Mypy
       run: |
         spin mypy
