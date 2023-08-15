@@ -62,7 +62,6 @@ jobs:
     - name: Build
       run: |
         spin build -- -Dallow-noblas=true -Ddisable-optimization=true
-    - name: Test
+    - name: Run Mypy
       run: |
-        export NPY_RUN_MYPY_IN_TESTSUITE=1
-        spin test -m full -- numpy/typing
+        spin mypy
