@@ -7,6 +7,9 @@ name: Run MyPy
 #   - Python versions: lowest/highest supported versions, and an intermediate one
 #
 # The build matrix aims for sparse coverage across those two dimensions.
+# Use of BLAS/LAPACK and SIMD is disabled on purpose, because those things
+# don't matter for static typing and this speeds up the builds.
+#
 # This is a separate job file so it's easy to trigger by hand.
 
 on:
@@ -45,8 +48,8 @@ jobs:
       matrix:
         os_python:
           - [ubuntu-latest, '3.9']
-            # - [windows-2019, '3.11']
-            # - [macos-12, '3.12-dev']
+          - [windows-2019, '3.11']
+          - [macos-12, '3.12-dev']
     steps:
     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
