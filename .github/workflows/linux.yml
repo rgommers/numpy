@@ -103,6 +103,7 @@ jobs:
 
   full:
     # Build a wheel, install it, then run the full test suite with code coverage
+    needs: [smoke_test]
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
