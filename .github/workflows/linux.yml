@@ -130,7 +130,7 @@ jobs:
         pip install dist/numpy*.whl
     - name: Run full test suite
       run: |
-        cd doc
+        cd tools
         pytest --pyargs numpy --cov-report=html:build/coverage
         # TODO: gcov
 
@@ -201,6 +201,6 @@ jobs:
         pip install -r test_requirements.txt
     - name: Run test suite
       run: |
-        cd doc
+        cd tools
         pytest --pyargs numpy -m "not slow"
 
