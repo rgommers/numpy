@@ -10,6 +10,7 @@ on:
     branches:
       # coverage comparison in the "full" step needs to run on main after merges
       - main
+      - debug-full
   pull_request:
     branches:
       - main
@@ -174,9 +175,7 @@ jobs:
     - uses: ./.github/actions
 
   sdist:
-    needs: [smoke_test]
     runs-on: ubuntu-latest
-    if: github.event_name != 'push'
     steps:
     - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
