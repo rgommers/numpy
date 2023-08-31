@@ -478,6 +478,8 @@ def configuration(parent_package='',top_path=None):
 
             # Get long double representation
             rep = check_long_double_representation(config_cmd)
+            print(rep)
+            asdljk
             moredefs.append(('HAVE_LDOUBLE_%s' % rep, 1))
 
             if check_for_right_shift_internal_compiler_error(config_cmd):
