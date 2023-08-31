@@ -4,6 +4,9 @@
 name: Test Emscripten/Pyodide build
 
 on:
+  push:
+    branches:
+      - test-ldouble-emscripten
   pull_request:
     branches:
       - main
@@ -19,7 +22,7 @@ permissions:
 jobs:
   build-wasm-emscripten:
     runs-on: ubuntu-22.04
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     env:
       PYODIDE_VERSION: 0.23.1
       # PYTHON_VERSION and EMSCRIPTEN_VERSION are determined by PYODIDE_VERSION.
