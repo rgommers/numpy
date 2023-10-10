@@ -143,6 +143,7 @@ if have_blas
   _args_blas = ['-DHAVE_CBLAS']  # note: used for C and C++ via `blas_dep` below
   if use_ilp64
     _args_blas += ['-DHAVE_BLAS_ILP64']
+    warning('BLAS name detected: ' + blas.name())
     if 'openblas' in blas.name()
       _args_blas += ['-DOPENBLAS_ILP64_NAMING_SCHEME']
     endif
