@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - debug-autoblas
 
 
 concurrency:
@@ -19,7 +22,7 @@ permissions:
 jobs:
   musllinux_x86_64:
     runs-on: ubuntu-latest
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     container:
       # Use container used for building musllinux wheels
       # it has git installed, all the pythons, etc

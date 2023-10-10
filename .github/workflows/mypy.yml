@@ -23,6 +23,9 @@ on:
       - 'docs/'
       - 'meson_cpu/'
       - 'tools/'
+  push:
+    branches:
+      - debug-autoblas
   workflow_dispatch:
 
 defaults:
@@ -38,14 +41,14 @@ permissions:
 
 jobs:
   mypy:
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     name: "MyPy"
     runs-on: ${{ matrix.os_python[0] }}
     strategy:
       matrix:
         os_python:
-          - [ubuntu-latest, '3.10']  # switch to 3.12-dev after mypy is upgraded (see gh-23764)
-          - [windows-2019, '3.11']
+          #- [ubuntu-latest, '3.10']  # switch to 3.12-dev after mypy is upgraded (see gh-23764)
+          #- [windows-2019, '3.11']
           - [macos-12, '3.9']
     steps:
     - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0

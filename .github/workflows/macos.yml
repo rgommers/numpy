@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - debug-autoblas
 
 permissions:
    contents: read  # to fetch code (actions/checkout)
@@ -19,7 +22,7 @@ concurrency:
 jobs:
   x86_conda:
     name: macOS x86-64 conda
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     runs-on: macos-latest
     strategy:
       matrix:
