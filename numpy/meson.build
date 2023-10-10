@@ -89,6 +89,15 @@ mkl_may_use_sdl = not use_ilp64 and _threading_opt in ['auto', 'iomp']
 
 # Note that we can only use a BLAS which provides a CBLAS interface. So disable
 # BLAS completely if CBLAS is not found.
+
+# First try scipy-openblas, and if found don't look for cblas or lapack, we
+# know what's inside the scipy-openblas wheels already.
+if blas_name == 'openblas' or blas_name == 'auto'
+  blas = dependency('scipy-openblas', required: false)
+  if blas.found()
+    blas_name = 'scipy-openblas'
+  endif
+endif
 if blas_name == 'auto'
   foreach _name : get_option('blas-order')
     if _name == 'mkl'
@@ -158,7 +167,7 @@ else
   endif
 endif
 
-if 'mkl' in blas.name() or blas.name() == 'accelerate'
+if 'mkl' in blas.name() or blas.name() == 'accelerate' or blas_name == 'scipy-openblas'
   # For these libraries we know that they contain LAPACK, and it's desirable to
   # use that - no need to run the full detection twice.
   lapack = blas
