@@ -143,12 +143,13 @@ if have_blas
   _args_blas = ['-DHAVE_CBLAS']  # note: used for C and C++ via `blas_dep` below
   if use_ilp64
     _args_blas += ['-DHAVE_BLAS_ILP64']
-    if blas.name() == 'openblas'
+    if 'openblas' in blas.name()
       _args_blas += ['-DOPENBLAS_ILP64_NAMING_SCHEME']
     endif
   endif
   if blas_symbol_suffix == 'auto'
     blas_symbol_suffix = blas.get_variable('symbol_suffix', default_value: '')
+    message(f'BLAS symbol suffix: @blas_symbol_suffix@')
   endif
   if blas_symbol_suffix != ''
     _args_blas += ['-DBLAS_SYMBOL_SUFFIX=' + blas_symbol_suffix]
