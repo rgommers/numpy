@@ -187,7 +187,7 @@ repair-wheel-command = "bash ./tools/wheels/repair_windows.sh {wheel} {dest_dir}
 [[tool.cibuildwheel.overrides]]
 select = "*-win32"
 environment = {PKG_CONFIG_PATH="/opt/32/lib/pkgconfig"}
-config-settings = "setup-args=--vsenv"
+config-settings = "setup-args=--vsenv setup-args=-Dallow-noblas=true"
 #config-settings = "setup-args=--vsenv setup-args=-Dallow-noblas=true"
 repair-wheel-command = ""
 
