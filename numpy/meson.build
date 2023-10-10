@@ -149,7 +149,11 @@ if have_blas
     endif
   endif
   if blas_symbol_suffix == 'auto'
-    blas_symbol_suffix = blas.get_variable('symbol_suffix', default_value: '')
+    if blas_name == 'scipy-openblas' and use_ilp64
+      blas_symbol_suffix = '64_'
+    else
+      blas_symbol_suffix = blas.get_variable('symbol_suffix', default_value: '')
+    endif
     message(f'BLAS symbol suffix: @blas_symbol_suffix@')
   endif
   if blas_symbol_suffix != ''
