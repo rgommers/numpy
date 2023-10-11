@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - debug-musl
 
 
 concurrency:
@@ -19,7 +22,7 @@ permissions:
 jobs:
   musllinux_x86_64:
     runs-on: ubuntu-latest
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     container:
       # Use container used for building musllinux wheels
       # it has git installed, all the pythons, etc
@@ -63,7 +66,14 @@ jobs:
         spin build --with-scipy-openblas=64 -- -Duse-ilp64=true
         spin test -j auto
 
+    - name: build.ninja
+      shell: bash
+      if: always()
+      run: |
+        cat build/build.ninja
+
     - name: Meson Log
       shell: bash
+      if: always()
       run: |
         cat build/meson-logs/meson-log.txt
