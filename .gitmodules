@@ -9,4 +9,5 @@
 	url = https://github.com/intel/x86-simd-sort
 [submodule "vendored-meson/meson"]
 	path = vendored-meson/meson
-	url = https://github.com/numpy/meson.git
+    url = https://github.com/rgommers/meson.git
+    branch = unvendor
