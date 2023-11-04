@@ -29,7 +29,7 @@ Building NumPy requires the following software installed:
 2) Compilers
 
    Much of NumPy is written in C and C++.  You will need a C compiler that
-   complies with the C99 standard, and a C++ compiler that complies with the
+   complies with the C11 standard, and a C++ compiler that complies with the
    C++17 standard.
 
    While a FORTRAN 77 compiler is not necessary for building NumPy, it is
