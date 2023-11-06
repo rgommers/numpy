@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - c11-debug
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -17,7 +20,7 @@ jobs:
   python64bit_openblas:
     name: x86-64, LP64 OpenBLAS
     runs-on: windows-2019
-    if: "github.repository == 'numpy/numpy'"
+    if: "github.repository == 'rgommers/numpy'"
     strategy:
       matrix:
         compiler: ["MSVC", "Clang-cl"]
