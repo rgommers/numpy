@@ -38,7 +38,8 @@ jobs:
 
     - name: Install build dependencies from PyPI
       run: |
-        python -m pip install spin Cython
+        python -m pip install spin
+        python -m pip install git+https://github.com/cython/cython.git@3.0.x
 
     - name: Install pkg-config
       run: |
