@@ -96,6 +96,7 @@ jobs:
           architecture: 'x86'
 
       - name: pkg-config-for-win
+        if: runner.os == 'windows'
         run: |
           choco install -y --no-progress --stoponfirstfailure --checksum 6004DF17818F5A6DBF19CB335CC92702 pkgconfiglite
           $CIBW = "${{ github.workspace }}/.openblas"
@@ -105,7 +106,6 @@ jobs:
           # passed through, so convert it to '/'
           $CIBW = $CIBW.replace("\","/")
           echo "CIBW_ENVIRONMENT_WINDOWS=PKG_CONFIG_PATH=$CIBW" >> $env:GITHUB_ENV
-        if: runner.os == 'windows'
 
       # Used to push the built wheels
       - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
