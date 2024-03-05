@@ -27,6 +27,11 @@ elif [ -z $INSTALL_OPENBLAS ]; then
     export INSTALL_OPENBLAS=true
 fi
 
+if [[ "$USE_ACCELERATE" = "true" ]] ; then
+    # The USE_ACCELERATE env var is set in .github/workflow/wheels
+    export INSTALL_OPENBLAS=false
+fi
+
 # Install Openblas from scipy-openblas64
 if [[ "$INSTALL_OPENBLAS" = "true" ]] ; then
     echo PKG_CONFIG_PATH $PKG_CONFIG_PATH
