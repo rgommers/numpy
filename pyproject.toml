@@ -162,7 +162,7 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/project/.openblas/lib"
 [tool.cibuildwheel.macos]
 # universal2 wheels are not supported (see gh-21233), use `delocate-fuse` if you need them
 archs = "x86_64 arm64"
-test-skip = "*_universal2:arm64"
+test-skip = "*-macosx_14_0_x64_64"  # built on macOS 13 runner, so can't install
 # Not clear why the DYLD_LIBRARY_PATH is not passed through from the environment
 repair-wheel-command = [
   "export DYLD_LIBRARY_PATH=$PWD/.openblas/lib",
