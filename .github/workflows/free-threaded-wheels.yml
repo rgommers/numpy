@@ -26,6 +26,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - nogil-wheels-windows
   # we don't want to upload free-threaded wheels to pypi yet
   # so we don't build on tags
   workflow_dispatch:
@@ -61,11 +64,6 @@ jobs:
 
   build_wheels:
     name: Build wheel ${{ matrix.python }}-${{ matrix.buildplat[1] }}-${{ matrix.buildplat[2] }}
-    needs: get_commit_message
-    if: >-
-      contains(needs.get_commit_message.outputs.message, '[wheel build]') ||
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.buildplat[0] }}
     strategy:
       # Ensure that a wheel builder finishes even if another fails
@@ -74,10 +72,10 @@ jobs:
         # Github Actions doesn't support pairing matrix values together, let's improvise
         # https://github.com/github/feedback/discussions/7835#discussioncomment-1769026
         buildplat:
-          - [ubuntu-20.04, manylinux_x86_64, ""]
-          - [ubuntu-20.04, musllinux_x86_64, ""]
+          #- [ubuntu-20.04, manylinux_x86_64, ""]
+          #- [ubuntu-20.04, musllinux_x86_64, ""]
           - [windows-2019, win_amd64, ""]
-          - [windows-2019, win32, ""]
+          #- [windows-2019, win32, ""]
           # TODO: add macOS - cibuildwheel does not yet support Mac for free-threaded Python
         python: ["cp313t"]
     env:
