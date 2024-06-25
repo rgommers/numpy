@@ -138,7 +138,12 @@ jobs:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
           # TODO: remove along with installing build deps in
           # cibw_before_build.sh when a released cython can build numpy
-          CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation"
+          CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation -v"
+
+      - name: Show meson-log.txt
+        shell: bash
+        if: failure()
+        run: cat build/meson-logs/meson-log.txt
 
       - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
