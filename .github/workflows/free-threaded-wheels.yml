@@ -75,6 +75,7 @@ jobs:
           - [ubuntu-20.04, manylinux_x86_64, ""]
           # TODO: set up Windows wheels windows is supported on cibuildwheel but
           # numpy doesn't build on the image yet
+          - [windows-2019, win_amd64, ""]
         python: ["cp313t"]
     env:
       IS_32_BIT: ${{ matrix.buildplat[1] == 'win32' }}
