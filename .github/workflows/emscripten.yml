@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - bump-cibuildwheel-pyodide
   # Note: this workflow gets triggered on the same schedule as the
   # wheels.yml workflow to upload WASM wheels to Anaconda.org.
   schedule:
@@ -40,7 +43,6 @@ jobs:
     name: Build NumPy distribution for Pyodide
     runs-on: ubuntu-22.04
     # To enable this workflow on a fork, comment out:
-    if: github.repository == 'numpy/numpy'
     steps:
       - name: Checkout NumPy
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
