@@ -8916,6 +8916,8 @@ class TestConversion:
         assert_raises(NotImplementedError, bool, np.array([NotConvertible()]))
         if IS_PYSTON:
             pytest.skip("Pyston disables recursion checking")
+        if IS_WASM:
+            pytest.skip("Pyodide no longer supports recursion checking")
 
         self_containing = np.array([None])
         self_containing[0] = self_containing
@@ -10423,7 +10425,7 @@ class TestDevice:
 
 def test_array_interface_excess_dimensions_raises():
     """Regression test for gh-27949: ensure too many dims raises ValueError instead of segfault."""
-    
+
     # Dummy object to hold a custom __array_interface__
     class DummyArray:
         def __init__(self, interface):
@@ -10435,7 +10437,7 @@ def test_array_interface_excess_dimensions_raises():
     interface = dict(base.__array_interface__)
 
     # Modify the shape to exceed NumPy's dimension limit (NPY_MAXDIMS, typically 64)
-    interface['shape'] = tuple([1] * 136)  # match the original bug report 
+    interface['shape'] = tuple([1] * 136)  # match the original bug report
 
     dummy = DummyArray(interface)
     # Now, using np.asanyarray on this dummy should trigger a ValueError (not segfault)
