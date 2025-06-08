@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - win-pypi-pkgconf
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -18,7 +21,6 @@ jobs:
     name: x86-64, LP64 OpenBLAS
     runs-on: windows-2022
     # To enable this job on a fork, comment out:
-    if: github.repository == 'numpy/numpy'
     strategy:
       fail-fast: false
       matrix:
