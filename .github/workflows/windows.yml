@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - check-noblas-win
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -18,7 +21,6 @@ jobs:
     name: x86-64, LP64 OpenBLAS
     runs-on: windows-2022
     # To enable this job on a fork, comment out:
-    if: github.repository == 'numpy/numpy'
     strategy:
       fail-fast: false
       matrix:
@@ -61,18 +63,18 @@ jobs:
       if: matrix.compiler-pyversion[0] == 'MSVC'
       run: |
         pip install -r requirements/ci_requirements.txt
-        spin build --with-scipy-openblas=32 -j2 -- --vsenv
+        spin build --with-scipy-openblas=32 -j2 -- --vsenv -Dallow-noblas=false
 
     - name: Install NumPy (Clang-cl)
       if: matrix.compiler-pyversion[0] == 'Clang-cl'
       run: |
         "[binaries]","c = 'clang-cl'","cpp = 'clang-cl'","ar = 'llvm-lib'","c_ld = 'lld-link'","cpp_ld = 'lld-link'" | Out-File $PWD/clang-cl-build.ini -Encoding ascii
         pip install -r requirements/ci_requirements.txt
-        spin build --with-scipy-openblas=32 -j2 -- --vsenv --native-file=$PWD/clang-cl-build.ini
+        spin build --with-scipy-openblas=32 -j2 -- --vsenv --native-file=$PWD/clang-cl-build.ini -Dallow-noblas=false
 
     - name: Meson Log
       shell: bash
-      if: ${{ failure()  }}
+      #if: ${{ failure()  }}
       run: |
         cat build/meson-logs/meson-log.txt
 
