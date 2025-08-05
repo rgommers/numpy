@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - undefined-behavior-ubsan-suppressions
   pull_request:
     branches:
       - main
@@ -102,8 +103,6 @@ jobs:
            -- -v -s --timeout=600 --durations=10
 
   ubuntu_UBSAN:
-    # To enable this workflow on a fork, comment out:
-    if: github.repository == 'numpy/numpy'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -124,7 +123,7 @@ jobs:
         run: pyenv --version
       - name: Build python with address sanitizer
         run: |
-          CONFIGURE_OPTS="--with-address-sanitizer" pyenv install 3.14t
+          CONFIGURE_OPTS="--with-address-sanitizer" MAKE_OPTS="-j4" pyenv install 3.14t
           pyenv global 3.14t
       - name: Install dependencies
         run: |
@@ -132,7 +131,7 @@ jobs:
           pip install -r requirements/ci_requirements.txt
           pip install -r requirements/test_requirements.txt
       - name: Build numpy with UndefinedBehaviorSanitizer
-        run: python -m spin build -j2 -- -Db_sanitize=address,undefined -Db_lundef=false
+        run: python -m spin build -- -Db_sanitize=address,undefined -Db_lundef=false
       - name: Test
         run: |
           # pass -s to pytest to see UBSAN errors and warnings, otherwise pytest captures them
