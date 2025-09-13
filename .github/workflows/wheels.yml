@@ -34,7 +34,7 @@ jobs:
         # https://github.com/github/feedback/discussions/7835#discussioncomment-1769026
         buildplat:
           - [macos-14, macosx_x86_64, openblas]
-          - [macos-14, macosx_arm64, openblas]
+          #- [macos-14, macosx_arm64, openblas]
         python: ["cp311"]
 
     env:
@@ -80,7 +80,7 @@ jobs:
           if [[ ${{ matrix.buildplat[1] }} == 'macosx_x86_64' ]]; then
             # Needed because we're cross-compiling to x86-64 and testing under Rosetta
             echo "CIBW_ARCHS_MACOS=x86_64" >> "$GITHUB_ENV"
-            echo "CIBW_CONFIG_SETTINGS_MACOS=setup-args=--cross-file=$PWDtools/ci/cross_macos_x86-64.ini" > "$GITHUB_ENV"
+            #echo "CIBW_CONFIG_SETTINGS_MACOS=setup-args=--cross-file=$PWDtools/ci/cross_macos_x86-64.ini" > "$GITHUB_ENV"
           fi
 
       - name: Build wheels
