@@ -9,6 +9,9 @@ on:
     branches:
       - main
       - maintenance/**
+  push:
+    branches:
+      - macos-x86-rosetta
   workflow_dispatch:
 
 concurrency:
@@ -22,7 +25,7 @@ jobs:
   build_wheels:
     name: Build wheel ${{ matrix.python }}-${{ matrix.buildplat[1] }}-${{ matrix.buildplat[2] }}
     # To enable this job on a fork, comment out:
-    if: github.repository == 'numpy/numpy'
+    if: github.repository == 'rgommers/numpy'
     runs-on: ${{ matrix.buildplat[0] }}
     strategy:
       fail-fast: false
@@ -30,14 +33,8 @@ jobs:
         # Github Actions doesn't support pairing matrix values together, let's improvise
         # https://github.com/github/feedback/discussions/7835#discussioncomment-1769026
         buildplat:
-          - [ubuntu-22.04, manylinux_x86_64, ""]
-          - [ubuntu-22.04, musllinux_x86_64, ""]
-          - [ubuntu-22.04-arm, manylinux_aarch64, ""]
-          - [ubuntu-22.04-arm, musllinux_aarch64, ""]
-          - [macos-13, macosx_x86_64, openblas]
+          - [macos-14, macosx_x86_64, openblas]
           - [macos-14, macosx_arm64, openblas]
-          - [windows-2022, win_amd64, ""]
-          - [windows-11-arm, win_arm64, ""]
         python: ["cp311"]
 
     env:
@@ -79,22 +76,10 @@ jobs:
           echo "FC=gfortran-13" >> "$GITHUB_ENV"
           echo "F77=gfortran-13" >> "$GITHUB_ENV"
           echo "F90=gfortran-13" >> "$GITHUB_ENV"
-          if [[ ${{ matrix.buildplat[2] }} == 'accelerate' ]]; then
-            # macosx_arm64 and macosx_x86_64 with accelerate
-            # only target Sonoma onwards
-            CIBW="MACOSX_DEPLOYMENT_TARGET=14.0 INSTALL_OPENBLAS=false RUNNER_OS=macOS"
-            echo "CIBW_ENVIRONMENT_MACOS=$CIBW" >> "$GITHUB_ENV"
-
-            # the macos-13 image that's used for building the x86_64 wheel can't test
-            # a wheel with deployment target >= 14 without further work
-            echo "CIBW_TEST_SKIP=*-macosx_x86_64" >> "$GITHUB_ENV"
-          else
-            # macosx_x86_64 with OpenBLAS
-            # if INSTALL_OPENBLAS isn't specified then scipy-openblas is automatically installed
-            CIBW="RUNNER_OS=macOS"
-            PKG_CONFIG_PATH="$PWD/.openblas"
-            DYLD="$DYLD_LIBRARY_PATH:/$PWD/.openblas/lib"
-            echo "CIBW_ENVIRONMENT_MACOS=$CIBW PKG_CONFIG_PATH=$PKG_CONFIG_PATH DYLD_LIBRARY_PATH=$DYLD" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH/.openblas" >> "$GITHUB_ENV"
+          if [[ ${{ matrix.buildplat[1] }} == 'macosx_x86_64' ]]; then
+            # Needed because we're cross-compiling to x86-64 and testing under Rosetta
+            echo "CIBW_ARCHS_MACOS=x86_64" >> "$GITHUB_ENV"
           fi
 
       - name: Build wheels
