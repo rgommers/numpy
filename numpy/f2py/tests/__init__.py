@@ -19,7 +19,7 @@ if IS_EDITABLE:
     )
 
 
-if "CIBW_ARCHS_MACOS" in os.environ and os.environ["CIBW_ARCHS_MACOS"] == "x86_64":
+if os.environ.get("CIBW_ARCHS_MACOS") == "x86_64":
     pytest.skip(
         "f2py compile tests don't work when running on arm64 under Rosetta",
         allow_module_level=True
