@@ -31,7 +31,7 @@ fi
 if [[ $CIBW_ARCHS_MACOS == "x86_64" ]]; then
     # Don't run slow tests for macOS x86-64, since we're running under Rosetta
     # and compile tests will fail
-    python -c "import sys; import numpy; sys.exit(not numpy.test(extra_argv=['-n=auto', '--durations=10']))"
+    python -c "import sys; import numpy; sys.exit(not numpy.test(label='full', extra_argv=['-n=auto', '--durations=10']))"
 else
     python -c "import sys; import numpy; sys.exit(not numpy.test(label='full', extra_argv=['-n=auto', '--durations=10']))"
 fi
