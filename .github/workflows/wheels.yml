@@ -75,7 +75,7 @@ jobs:
           # Supported versions: https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
           echo "FC=gfortran-13" >> "$GITHUB_ENV"
           echo "PKG_CONFIG_PATH=$PWD/.openblas" >> "$GITHUB_ENV"
-          echo "DYLD_LIBRARY_PATH=$PWD/.openblas" >> "$GITHUB_ENV"  # needed for `delocate`
+          echo "DYLD_LIBRARY_PATH=$PWD/.openblas/lib" >> "$GITHUB_ENV"  # needed for `delocate`
 
           if [[ ${{ matrix.buildplat[1] }} == 'macosx_x86_64' ]]; then
             # Needed because we're cross-compiling to x86-64 and testing under Rosetta
