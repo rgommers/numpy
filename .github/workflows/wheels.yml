@@ -78,7 +78,7 @@ jobs:
           if [[ ${{ matrix.buildplat[1] }} == 'macosx_x86_64' ]]; then
             # Needed because we're cross-compiling to x86-64 and testing under Rosetta
             echo "CIBW_ARCHS_MACOS=x86_64" >> "$GITHUB_ENV"
-            echo "CIBW_CONFIG_SETTINGS_MACOS=setup-args=--cross-file=$PWD/tools/ci/cross_macos_x86-64.ini setup-args=-Dblas=openblas setup-args=-Dblas-order=openblas" >> "$GITHUB_ENV"
+            echo "CIBW_CONFIG_SETTINGS_MACOS=setup-args=--cross-file=$PWD/tools/ci/cross_macos_x86-64.ini setup-args=-Dblas=openblas setup-args=-Dlapack=openblas" >> "$GITHUB_ENV"
           fi
 
       - name: Build wheels
