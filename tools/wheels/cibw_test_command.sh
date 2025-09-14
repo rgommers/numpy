@@ -28,4 +28,10 @@ fi
 # Run full tests with -n=auto. This makes pytest-xdist distribute tests across
 # the available N CPU cores. Also print the durations for the 10 slowest tests
 # to help with debugging slow or hanging tests
-python -c "import sys; import numpy; sys.exit(not numpy.test(label='full', extra_argv=['-n=auto', '--durations=10']))"
+if [[ $CIBW_ARCHS_MACOS == "x86_64" ]]; then
+    # Don't run slow tests for macOS x86-64, since we're running under Rosetta
+    # and compile tests will fail
+    python -c "import sys; import numpy; sys.exit(not numpy.test(extra_argv=['-n=auto', '--durations=10']))"
+else
+    python -c "import sys; import numpy; sys.exit(not numpy.test(label='full', extra_argv=['-n=auto', '--durations=10']))"
+fi
