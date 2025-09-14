@@ -40,6 +40,7 @@ if [[ "$INSTALL_OPENBLAS" = "true" ]] ; then
     # hacky) after having used the arm64 package to write out the .pc file.
     if [[ $CIBW_ARCHS_MACOS == "x86_64" ]]; then
         python -m pip install -r $PROJECT_DIR/requirements/ci_requirements.txt --platform macosx_10_13_x86_64 --only-binary :all: -U --target $(python -c "import os; print(f'{os.path.dirname(os.__file__)}/site-packages')")
+        python -m pip install pkgconf --platform macosx_10_13_x86_64 --only-binary :all: -U --target $(python -c "import os; print(f'{os.path.dirname(os.__file__)}/site-packages')")
     fi
 
     # Copy scipy-openblas DLL's to a fixed location so we can point delvewheel
