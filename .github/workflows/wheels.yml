@@ -34,7 +34,7 @@ jobs:
         # https://github.com/github/feedback/discussions/7835#discussioncomment-1769026
         buildplat:
           - [macos-14, macosx_x86_64, openblas]
-          #- [macos-14, macosx_arm64, openblas]
+          - [macos-14, macosx_arm64, openblas]
         python: ["cp311"]
 
     env:
