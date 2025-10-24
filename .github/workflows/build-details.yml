@@ -43,22 +43,18 @@ jobs:
 
     - name: Install Python
       run: |
-        pixi init
-        pixi add python=3.14
+        pixi global install "python=3.14"
 
     - name: Check Python
       run: |
-        pixi shell
         which python
 
     - name: Check build-details.json
       run: |
-        pixi shell
         cat $(dirname $(which python))/../lib/python3.14/build-details.json
 
     - name: Check sysconfig variables
       run: |
-        pixi shell
         python -c "import sysconfig as s; print(s.get_config_var('LIBRARY'))"
         python -c "import sysconfig as s; print(s.get_config_var('LDLIBRARY'))"
         python -c "import sysconfig as s; print(s.get_config_var('LIBPYTHON'))"
