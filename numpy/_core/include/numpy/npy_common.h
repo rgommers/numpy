@@ -370,7 +370,24 @@ typedef double npy_double;
 typedef Py_hash_t npy_hash_t;
 #define NPY_SIZEOF_HASH_T NPY_SIZEOF_INTP
 
+/*
+ * The complex types below are either structs with a `_Val[2]` member, or the
+ * C99 `_Complex` types. `NPY_CPLX_IS_STRUCT` is defined if and only if they
+ * are the former.
+ *
+ * Any other code that needs to know which of the two is in use - `npy_math.h`
+ * for `npy_creal` & co., `npy_math_complex.c.src` for its constants - must
+ * branch on `NPY_CPLX_IS_STRUCT` rather than re-deriving the condition from
+ * `__cplusplus`/`_MSC_VER`. Those conditions got out of sync in 2.4.5, which
+ * broke `#include <numpy/npy_math.h>` for compilers defining both `_MSC_VER`
+ * and `__INTEL_LLVM_COMPILER` (gh-31337 follow-up).
+ *
+ * `NPY_CPLX_IS_STRUCT` is informational; do not define it yourself.
+ */
 #if defined(__cplusplus)
+
+/* `_Complex` is not standard C++, so use a layout-compatible struct instead. */
+#define NPY_CPLX_IS_STRUCT 1
 
 typedef struct
 {
@@ -392,22 +409,29 @@ typedef struct
 #include <complex.h>
 
 
+#if defined(_MSC_VER)
 /*
- * Which complex types are available is a property of the C runtime, not of the
- * compiler front end: the Microsoft C runtime has no C99 `_Complex` types, and
- * declares every `<complex.h>` function (`creal`, `cexp`, ...) in terms of
- * `_Fcomplex`/`_Dcomplex`/`_Lcomplex` for whichever compiler is targeting it.
+ * The Microsoft C runtime does not implement the C99 `_Complex` types; it
+ * provides the `_Fcomplex`/`_Dcomplex`/`_Lcomplex` structs instead, and every
+ * `<complex.h>` function (`creal`, `cexp`, ...) is declared in terms of those.
+ * That is a property of the C runtime, not of the compiler front end, so it
+ * holds for every compiler targeting that runtime: MSVC, clang-cl and the
+ * Intel compilers (`icx-cl`, `icl`) alike.
  *
- * Do not exempt individual front ends here. Doing that for the Intel LLVM
- * compilers in 2.4.5 left `npy_cdouble` as `double _Complex` while the
- * accessors in `npy_math.h` kept calling the runtime's `creal(_Dcomplex)`, so
- * `#include <numpy/npy_math.h>` no longer compiled with `icx` on Windows.
+ * Do not add front-end specific exemptions here (`__INTEL_COMPILER`,
+ * `__INTEL_LLVM_COMPILER`, ...). Doing so makes the `<complex.h>` declarations
+ * unusable from these headers. The two spellings are layout-compatible, so
+ * describing array data works either way, but for extensions linking `npymath`
+ * it also changes the signature of the ~60 functions there that take or return
+ * these types by value - `npymath` is shipped as a static library, built with
+ * MSVC for the official wheels.
  */
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+#define NPY_CPLX_IS_STRUCT 1
+
 typedef _Dcomplex npy_cdouble;
 typedef _Fcomplex npy_cfloat;
 typedef _Lcomplex npy_clongdouble;
-#else /* !defined(_MSC_VER) || defined(__INTEL_COMPILER) */
+#else /* !defined(_MSC_VER) */
 typedef double _Complex npy_cdouble;
 typedef float _Complex npy_cfloat;
 typedef longdouble_t _Complex npy_clongdouble;

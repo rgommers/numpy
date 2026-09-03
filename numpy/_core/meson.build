@@ -180,6 +180,12 @@ if not cc.has_header('complex.h')
   error('"complex.h" header not found')
 endif
 
+# Note: this only computes NPY_SIZEOF_COMPLEX_*, so it deliberately does not have to
+# mirror the typedef condition in `include/numpy/npy_common.h` (which keys on `_MSC_VER`
+# alone). On Windows `sizeof(_Fcomplex) == sizeof(complex float)` and so on, so the two
+# cannot disagree in any observable way. Compilers that accept MSVC-style arguments but
+# whose `<complex.h>` probe does not report `_Fcomplex` are handled by taking the C99
+# branch here; see gh-31337.
 if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl'
   complex_types_to_check = [
     ['NPY_SIZEOF_COMPLEX_FLOAT', '_Fcomplex'],

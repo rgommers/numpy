@@ -360,9 +360,21 @@ NPY_INPLACE npy_longdouble npy_heavisidel(npy_longdouble x, npy_longdouble h0);
  * Complex declarations
  */
 
+/*
+ * Real/imaginary accessors. These must agree with the complex typedefs in
+ * `npy_common.h`, which is what `NPY_CPLX_IS_STRUCT` is for - do not replace it
+ * with a `__cplusplus`/`_MSC_VER`/`__INTEL_*` check here. The two got out of
+ * sync in 2.4.5, which made this header fail to compile on its own for
+ * compilers defining both `_MSC_VER` and `__INTEL_LLVM_COMPILER`: `npy_cdouble`
+ * was `double _Complex` while the UCRT declares `creal()` as taking
+ * `_Dcomplex`.
+ *
+ * `_Val` is the member name used both by NumPy's own C++ struct and by the
+ * MSVC runtime's `_C_double_complex` & co.
+ */
 static inline double npy_creal(const npy_cdouble z)
 {
-#if defined(__cplusplus)
+#ifdef NPY_CPLX_IS_STRUCT
     return z._Val[0];
 #else
     return creal(z);
@@ -376,7 +388,7 @@ static inline void npy_csetreal(npy_cdouble *z, const double r)
 
 static inline double npy_cimag(const npy_cdouble z)
 {
-#if defined(__cplusplus)
+#ifdef NPY_CPLX_IS_STRUCT
     return z._Val[1];
 #else
     return cimag(z);
@@ -390,7 +402,7 @@ static inline void npy_csetimag(npy_cdouble *z, const double i)
 
 static inline float npy_crealf(const npy_cfloat z)
 {
-#if defined(__cplusplus)
+#ifdef NPY_CPLX_IS_STRUCT
     return z._Val[0];
 #else
     return crealf(z);
@@ -404,7 +416,7 @@ static inline void npy_csetrealf(npy_cfloat *z, const float r)
 
 static inline float npy_cimagf(const npy_cfloat z)
 {
-#if defined(__cplusplus)
+#ifdef NPY_CPLX_IS_STRUCT
     return z._Val[1];
 #else
     return cimagf(z);
@@ -418,7 +430,11 @@ static inline void npy_csetimagf(npy_cfloat *z, const float i)
 
 static inline npy_longdouble npy_creall(const npy_clongdouble z)
 {
-#if defined(__cplusplus)
+#ifdef NPY_CPLX_IS_STRUCT
+    /*
+     * The cast matters on Windows, where `_Lcomplex::_Val` is `long double`
+     * while `npy_longdouble` is `double`.
+     */
     return (npy_longdouble)z._Val[0];
 #else
     return creall(z);
@@ -432,7 +448,7 @@ static inline void npy_csetreall(npy_clongdouble *z, const longdouble_t r)
 
 static inline npy_longdouble npy_cimagl(const npy_clongdouble z)
 {
-#if defined(__cplusplus)
+#ifdef NPY_CPLX_IS_STRUCT
     return (npy_longdouble)z._Val[1];
 #else
     return cimagl(z);

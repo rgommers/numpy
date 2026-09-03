@@ -1,14 +1,19 @@
 /*
  * Prototypes for C99 complex-math functions probed as a batch by meson.build.
  *
- * For MSVC we must include <complex.h> to pick up the non-standard
- * _Fcomplex/_Dcomplex/_Lcomplex typedefs, since MSVC doesn't support the C99 `_Complex`
- * keyword directly. For every other compiler we avoid including <complex.h> so that
+ * For the MSVC runtime we must include <complex.h> to pick up the non-standard
+ * _Fcomplex/_Dcomplex/_Lcomplex typedefs, since that runtime doesn't provide the C99
+ * `_Complex` types. For every other compiler we avoid including <complex.h> so that
  * macro-based declarations (notably musl's `#define crealf(x) ((float)(x))`) don't
  * conflict with the plain prototypes below.
+ *
+ * The condition below must be kept in sync by hand with the complex typedefs in
+ * `include/numpy/npy_common.h`; this file is compiled standalone by the meson probes,
+ * so it cannot use `NPY_CPLX_IS_STRUCT`. In particular, do not add compiler front-end
+ * exemptions here - which runtime provides which types is not a front-end property.
  */
 
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+#if defined(_MSC_VER)
 #include <complex.h>
 typedef _Fcomplex cfloat;
 typedef _Dcomplex cdouble;

@@ -65,7 +65,8 @@ static const volatile npy_float tiny = 3.9443045e-31f;
 /*==========================================================
  * Constants
  *=========================================================*/
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+/* See the `NPY_CPLX_IS_STRUCT` comment in `npy_common.h`. */
+#ifdef NPY_CPLX_IS_STRUCT
 static const @ctype@ c_1@c@ = {1.0@C@, 0.0@C@};
 #else
 static const @ctype@ c_1@c@ = 1.0@C@;
