@@ -1,0 +1,17 @@
+Complex typedefs on Windows again follow the C runtime
+------------------------------------------------------
+On Windows, ``npy_cfloat``, ``npy_cdouble`` and ``npy_clongdouble`` are again
+typedef'd to the MSVC runtime's ``_Fcomplex``, ``_Dcomplex`` and ``_Lcomplex``
+for the Intel LLVM compilers (``icx``, ``icx-cl``), as they already were for
+MSVC and ``clang-cl``.
+
+NumPy 2.4.5 made those compilers use the C99 ``_Complex`` types instead, which
+made ``#include <numpy/npy_math.h>`` fail to compile with them: the accessors in
+that header call the runtime's ``creal()`` & co., which are declared as taking
+``_Dcomplex`` no matter which front end compiles them. Which complex types are
+available is a property of the C runtime, not of the compiler front end.
+
+The two spellings are layout-compatible, so extensions that only use these types
+to describe array data were unaffected beyond the compile error. For extensions
+that link ``npymath``, it also changed the signature of every function there
+taking or returning a complex value by value.

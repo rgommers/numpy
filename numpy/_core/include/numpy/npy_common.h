@@ -392,11 +392,22 @@ typedef struct
 #include <complex.h>
 
 
-#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
+/*
+ * Which complex types are available is a property of the C runtime, not of the
+ * compiler front end: the Microsoft C runtime has no C99 `_Complex` types, and
+ * declares every `<complex.h>` function (`creal`, `cexp`, ...) in terms of
+ * `_Fcomplex`/`_Dcomplex`/`_Lcomplex` for whichever compiler is targeting it.
+ *
+ * Do not exempt individual front ends here. Doing that for the Intel LLVM
+ * compilers in 2.4.5 left `npy_cdouble` as `double _Complex` while the
+ * accessors in `npy_math.h` kept calling the runtime's `creal(_Dcomplex)`, so
+ * `#include <numpy/npy_math.h>` no longer compiled with `icx` on Windows.
+ */
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 typedef _Dcomplex npy_cdouble;
 typedef _Fcomplex npy_cfloat;
 typedef _Lcomplex npy_clongdouble;
-#else /* !defined(_MSC_VER) || defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER) */
+#else /* !defined(_MSC_VER) || defined(__INTEL_COMPILER) */
 typedef double _Complex npy_cdouble;
 typedef float _Complex npy_cfloat;
 typedef longdouble_t _Complex npy_clongdouble;
